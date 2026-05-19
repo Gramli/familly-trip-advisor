@@ -42,7 +42,7 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning
                     BackoffType = DelayBackoffType.Exponential,
                     UseJitter = true,
                     ShouldHandle = new PredicateBuilder<Result<T>>()
-                        .Handle<Exception>()
+                        .Handle<Exception>(ex => ex is not OperationCanceledException)
                         .HandleResult(r => r.IsFailed)
                 })
                 .Build();

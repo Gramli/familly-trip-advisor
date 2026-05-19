@@ -11,7 +11,7 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
     {
         public string BuildActivityPrompt(ForecastWeatherDto forecastWeather)
         {
-            var forecastLine = string.Join("\n", $"  - Date: {forecastWeather.ValidDate:yyyy-MM-dd}, Temp: {forecastWeather.MinTemp}°C–{forecastWeather.MaxTemp}°C (avg {forecastWeather.Temp}°C), Clouds: {forecastWeather.CloudsPercentage}%, Wind: {forecastWeather.WindSpeed} m/s");
+            var forecastLine = $"  - Date: {forecastWeather.ValidDate:yyyy-MM-dd}, Temp: {forecastWeather.MinTemp}°C–{forecastWeather.MaxTemp}°C (avg {forecastWeather.Temp}°C), Clouds: {forecastWeather.CloudsPercentage}%, Wind: {forecastWeather.WindSpeed} m/s";
 
             return "You are a family trip activity advisor. Based on the weather forecast below, decide whether the trip day is better suited for INDOOR or OUTDOOR activities.\n\n" +
                    "Rules:\n" +

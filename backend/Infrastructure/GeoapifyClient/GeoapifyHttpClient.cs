@@ -36,7 +36,7 @@ namespace familly_trip_advisor.Infrastructure.GeoapifyClient
                     Delay = TimeSpan.FromSeconds(2),
                     BackoffType = DelayBackoffType.Exponential,
                     UseJitter = true,
-                    ShouldHandle = new PredicateBuilder().Handle<Exception>(),
+                    ShouldHandle = new PredicateBuilder().Handle<Exception>(ex => ex is not OperationCanceledException),
                     OnRetry = args =>
                     {
                         _logger.LogWarning(
@@ -83,22 +83,17 @@ namespace familly_trip_advisor.Infrastructure.GeoapifyClient
                       $"&limit={limit}" +
                       $"&apiKey={_options.Value.ApiKey}";
 
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(url)
-            };
-
-            return SendAsync<PlacesDataModel>(request, cancellationToken);
+            return SendAsync<PlacesDataModel>(url, cancellationToken);
         }
 
-        private async Task<Result<T>> SendAsync<T>(HttpRequestMessage requestMessage, CancellationToken cancellationToken)
+        private async Task<Result<T>> SendAsync<T>(string url, CancellationToken cancellationToken)
         {
             try
             {
                 return await _retryPipeline.ExecuteAsync(async ct =>
                 {
-                    using var response = await _httpClient.SendAsync(requestMessage, ct);
+                    using var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = new Uri(url) };
+                    using var response = await _httpClient.SendAsync(request, ct);
 
                     if (!response.IsSuccessStatusCode)
                     {
