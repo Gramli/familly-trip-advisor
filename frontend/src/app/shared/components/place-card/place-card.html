@@ -1,0 +1,22 @@
+<article class="place-card">
+  <div class="place-card__header">
+    <span class="place-card__icon" aria-hidden="true">{{ icon() }}</span>
+    <div class="place-card__info">
+      <h4 class="place-card__name">{{ name() ?? 'Unknown place' }}</h4>
+      @if (address()) {
+        <p class="place-card__address">{{ address() }}</p>
+      }
+    </div>
+  </div>
+  <div class="place-card__footer">
+    @if (badge()) {
+      <span class="place-card__badge">{{ badge() }}</span>
+    }
+    @if (distance()) {
+      <span class="place-card__distance">{{ distance() }}</span>
+    }
+    <a class="place-card__maps-link" [href]="mapsUrl()" target="_blank" rel="noopener noreferrer">
+      Open in Maps ↗
+    </a>
+  </div>
+</article>

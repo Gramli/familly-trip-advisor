@@ -1,0 +1,16 @@
+<section class="section">
+  <h3 class="section__title">🍽️ Restaurants</h3>
+  <div class="cards-grid">
+    @for (restaurant of restaurants(); track restaurant.placeId ?? restaurant.name) {
+      <app-place-card
+        [name]="restaurant.name"
+        [address]="restaurant.address"
+        [distanceMeters]="restaurant.distanceMeters"
+        [latitude]="restaurant.latitude"
+        [longitude]="restaurant.longitude"
+        [badge]="cuisine(restaurant.categories)"
+        icon="🍽️"
+      />
+    }
+  </div>
+</section>

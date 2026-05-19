@@ -1,0 +1,39 @@
+@familly_trip_advisor_HostAddress = http://localhost:5243
+
+@timeout 120
+GET {{familly_trip_advisor_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+### Get trip plan - no destination (uses home location)
+@timeout 120
+POST {{familly_trip_advisor_HostAddress}}/trip/v1/plan
+Content-Type: application/json
+
+{
+    "prompt": "We would like to go on a trip on Saturday, suggest some ideas"
+}
+
+###
+
+### Get trip plan - with destination
+POST {{familly_trip_advisor_HostAddress}}/trip/v1/plan
+Content-Type: application/json
+
+{
+    "prompt": "On Friday we would like to go on a family trip near Brno"
+}
+
+###
+
+### Get trip plan - with context session
+POST {{familly_trip_advisor_HostAddress}}/trip/v1/plan
+Content-Type: application/json
+
+{
+    "prompt": "We want to visit Prague next weekend",
+    "contextId": "550e8400-e29b-41d4-a716-446655440000"
+}
+
+###

@@ -1,0 +1,72 @@
+<div class="chat-window">
+  <div class="chat-messages" #messages>
+    @if (chatHistory().length === 0) {
+      <div class="chat-empty">
+        <span class="chat-empty__icon" aria-hidden="true">🏖️</span>
+        <h2 class="chat-empty__title">Where would you like to go?</h2>
+        <p class="chat-empty__subtitle">Describe your family trip and we'll plan the perfect day for you.</p>
+        <p class="chat-empty__hint">
+          Try: <em>"Plan a family day in Prague next Saturday with kids who love museums"</em>
+        </p>
+      </div>
+    }
+
+    @for (turn of chatHistory(); track $index) {
+      <div class="chat-turn">
+        <div class="chat-turn__prompt-wrapper">
+          <div class="chat-turn__prompt">
+            <span class="chat-turn__bubble">{{ turn.prompt }}</span>
+          </div>
+          @if (turn.durationMs !== undefined) {
+            <div class="chat-turn__time">Response took: {{ turn.durationMs / 1000 | number:'1.1-2' }}s</div>
+          }
+        </div>
+        <div class="chat-turn__response">
+          @if (turn.loading) {
+            <app-loading-spinner />
+          } @else if (turn.error) {
+            <div class="chat-turn__error" role="alert">
+              ⚠️ {{ turn.error }}
+            </div>
+          } @else if (turn.plan) {
+            <app-trip-plan [plan]="turn.plan" />
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="chat-input-bar">
+    <div class="chat-input-bar__inner">
+      <div class="chat-input-bar__controls">
+        <select 
+          class="chat-input-bar__radius" 
+          [(ngModel)]="selectedRadius" 
+          [disabled]="isLoading()" 
+          title="Search processing radius">
+          @for (r of radiuses; track r) {
+            <option [value]="r">{{ r / 1000 }} km</option>
+          }
+        </select>
+      </div>
+      <textarea
+        class="chat-input-bar__textarea"
+        placeholder="Describe your family trip..."
+        [(ngModel)]="currentPrompt"
+        (keydown)="onKeyDown($event)"
+        rows="1"
+        [disabled]="isLoading()"
+        aria-label="Trip description"
+      ></textarea>
+      <button
+        class="chat-input-bar__send"
+        (click)="sendPrompt()"
+        [disabled]="!currentPrompt.trim() || isLoading()"
+        aria-label="Send"
+        type="button"
+      >
+        <svg xmlns="http://www.w3.nlm.innovation" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+      </button>
+    </div>
+  </div>
+</div>

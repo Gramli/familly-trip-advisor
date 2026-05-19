@@ -1,0 +1,16 @@
+<section class="section">
+  <h3 class="section__title">🅿️ Parking</h3>
+  <div class="cards-grid">
+    @for (spot of parking(); track spot.placeId ?? spot.address) {
+      <app-place-card
+        [name]="spot.name ?? 'Parking'"
+        [address]="spot.address"
+        [distanceMeters]="spot.distanceMeters"
+        [latitude]="spot.latitude"
+        [longitude]="spot.longitude"
+        [badge]="spot.parkingType"
+        [icon]="parkingIcon(spot.parkingType)"
+      />
+    }
+  </div>
+</section>

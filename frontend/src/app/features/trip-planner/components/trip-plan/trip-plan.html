@@ -1,0 +1,29 @@
+<div class="trip-plan">
+  <div class="trip-plan__meta">
+    @if (plan().destination) {
+      <span class="trip-plan__chip">📍 {{ plan().destination }}</span>
+    }
+    <span class="trip-plan__chip">📅 {{ plan().date }}</span>
+    @if (plan().activityType) {
+      <span class="trip-plan__chip">✨ {{ plan().activityType }}</span>
+    }
+  </div>
+
+  @if (plan().planSummary) {
+    <div class="trip-plan__summary">
+      <p>{{ plan().planSummary }}</p>
+    </div>
+  }
+
+  @if (plan().suggestedActivities.length) {
+    <app-activity-list [activities]="plan().suggestedActivities" />
+  }
+
+  @if (plan().suggestedRestaurants.length) {
+    <app-restaurant-list [restaurants]="plan().suggestedRestaurants" />
+  }
+
+  @if (plan().suggestedParking.length) {
+    <app-parking-list [parking]="plan().suggestedParking" />
+  }
+</div>

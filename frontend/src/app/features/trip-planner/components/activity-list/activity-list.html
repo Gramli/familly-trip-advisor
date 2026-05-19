@@ -1,0 +1,16 @@
+<section class="section">
+  <h3 class="section__title">🎯 Activities</h3>
+  <div class="cards-grid">
+    @for (activity of activities(); track activity.placeId ?? activity.name) {
+      <app-place-card
+        [name]="activity.name"
+        [address]="activity.address"
+        [distanceMeters]="activity.distanceMeters"
+        [latitude]="activity.latitude"
+        [longitude]="activity.longitude"
+        [badge]="activity.category"
+        [icon]="categoryIcon(activity.category)"
+      />
+    }
+  </div>
+</section>

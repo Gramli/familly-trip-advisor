@@ -1,0 +1,66 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.875rem 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (min-width: 640px) {
+  .app-header {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.app-header__content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.app-header__logo {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+@media (min-width: 640px) {
+  .app-header__logo {
+    font-size: 2.25rem;
+    gap: 1rem;
+  }
+}
+
+.app-header__title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 640px) {
+  .app-header__title {
+    font-size: 1.375rem;
+  }
+}
+
+.app-header__subtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .app-header__subtitle {
+    font-size: 0.875rem;
+  }
+}
