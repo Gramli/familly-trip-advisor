@@ -19,12 +19,12 @@ namespace familly_trip_advisor.Infrastructure.OllamaClient
         private readonly IMemoryCache _cache;
         private static readonly TimeSpan SessionExpiry = TimeSpan.FromMinutes(30);
 
-        private static readonly ChatOptions NothinkOptions = new()
+        private static readonly ChatOptions ModelOptions = new()
         {
             AdditionalProperties = new AdditionalPropertiesDictionary
             {
                 ["think"] = false,
-                ["keep_alive"] = 10m,
+                ["keep_alive"] = "10m",
             }
         };
 
@@ -41,7 +41,7 @@ namespace familly_trip_advisor.Infrastructure.OllamaClient
             await foreach (ChatResponseUpdate item in
                 _chatClient.GetStreamingResponseAsync(
                     [new(ChatRole.User, prompt)],
-                    NothinkOptions,
+                    ModelOptions,
                     cancellationToken))
             {
                 builder.Append(item.Text);
@@ -63,7 +63,7 @@ namespace familly_trip_advisor.Infrastructure.OllamaClient
             await foreach (ChatResponseUpdate item in
                 _chatClient.GetStreamingResponseAsync(
                     history,
-                    NothinkOptions,
+                    ModelOptions,
                     cancellationToken))
             {
                 builder.Append(item.Text);
