@@ -95,20 +95,17 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                     var primaryCategory = f.Properties.Categories
                         .FirstOrDefault(c => PlaceCategoryActivityMap.Categories.ContainsKey(c));
 
-                    return (primaryCategory, feature: f);
-                })
-                .Where(x => x.primaryCategory is not null
-                    && PlaceCategoryActivityMap.Categories[x.primaryCategory!] == activityType)
-                .Select(x => new ActivityPlaceDto
-                {
-                    Name = x.feature.Properties.Name!,
-                    Address = x.feature.Properties.Formatted,
-                    DistanceMeters = x.feature.Properties.Distance,
-                    Latitude = x.feature.Properties.Lat,
-                    Longitude = x.feature.Properties.Lon,
-                    ActivityType = activityType,
-                    Category = x.primaryCategory,
-                    PlaceId = x.feature.Properties.PlaceId
+                    return new ActivityPlaceDto
+                    {
+                        Name = f.Properties.Name!,
+                        Address = f.Properties.Formatted,
+                        DistanceMeters = f.Properties.Distance,
+                        Latitude = f.Properties.Lat,
+                        Longitude = f.Properties.Lon,
+                        ActivityType = activityType,
+                        Category = primaryCategory,
+                        PlaceId = f.Properties.PlaceId
+                    };
                 })
                 .ToList();
 
