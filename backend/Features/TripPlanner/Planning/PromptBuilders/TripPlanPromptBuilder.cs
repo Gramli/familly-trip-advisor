@@ -1,25 +1,16 @@
 using familly_trip_advisor.Features.TripPlanner.Models;
-using familly_trip_advisor.Infrastructure.WeatherbitClient;
 using System.Text;
 
 namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
 {
     public interface ITripPlanPromptBuilder
     {
-        string BuildTripPlanPrompt(
-            TripIntentionDto intention,
-            ForecastWeatherDto weather,
-            Activity activityType,
-            TripPlacesDto places);
+        string BuildTripPlanPrompt(BuildTripPlanRequest request);
     }
 
     internal sealed class TripPlanPromptBuilder : ITripPlanPromptBuilder
     {
-        public string BuildTripPlanPrompt(
-            TripIntentionDto intention,
-            ForecastWeatherDto weather,
-            Activity activityType,
-            TripPlacesDto places)
+        public string BuildTripPlanPrompt(BuildTripPlanRequest request)
         {
             var sb = new StringBuilder();
 
@@ -29,27 +20,27 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
 
             // ── Trip context ─────────────────────────────────────────────────────────
             sb.AppendLine("## Trip Details");
-            sb.AppendLine($"- Destination: {intention.Destination ?? "Home area"}");
-            sb.AppendLine($"- Date: {intention.Date:dddd, MMMM d yyyy}");
-            sb.AppendLine($"- Activity preference: {activityType}");
-            sb.AppendLine($"- Weather: avg {weather.Temp:F1}°C, min {weather.MinTemp:F1}°C, max {weather.MaxTemp:F1}°C, clouds {weather.CloudsPercentage:F0}%, wind {weather.WindSpeed:F1} m/s");
+            sb.AppendLine($"- Destination: {request.Intention.Destination ?? "Home area"}");
+            sb.AppendLine($"- Date: {request.Intention.Date:dddd, MMMM d yyyy}");
+            sb.AppendLine($"- Activity preference: {request.ActivityType}");
+            sb.AppendLine($"- Weather: avg {request.Weather.Temp:F1}°C, min {request.Weather.MinTemp:F1}°C, max {request.Weather.MaxTemp:F1}°C, clouds {request.Weather.CloudsPercentage:F0}%, wind {request.Weather.WindSpeed:F1} m/s");
             sb.AppendLine();
 
             // ── Candidate places ─────────────────────────────────────────────────────
-            AppendPlaceList(sb, "Activities", places.Activities
+            AppendPlaceList(sb, "Activities", request.Places.Activities
                 .Select((p, i) => $"[A{i + 1}] {p.Name} | {p.Category} | {p.ActivityType} | {p.DistanceMeters:F0} m | {p.Address}"));
 
-            AppendPlaceList(sb, "Restaurants", places.Restaurants
+            AppendPlaceList(sb, "Restaurants", request.Places.Restaurants
                 .Select((p, i) => $"[R{i + 1}] {p.Name} | {string.Join(", ", p.Categories.Take(2))} | {p.DistanceMeters:F0} m | {p.Address}"));
 
-            AppendPlaceList(sb, "Parking", places.Parking
+            AppendPlaceList(sb, "Parking", request.Places.Parking
                 .Select((p, i) => $"[P{i + 1}] {p.Name ?? "Unnamed parking"} | {p.ParkingType} | {p.DistanceMeters:F0} m | {p.Address}"));
 
             // ── Output rules ─────────────────────────────────────────────────────────
             sb.AppendLine("## Rules");
             sb.AppendLine("- Pick exactly 2 or 3 activities, 2 or 3 restaurants, and 2 or 3 parking spots.");
             sb.AppendLine("- Prefer places CLOSER to the destination (smaller distance is better).");
-            sb.AppendLine($"- For activities, prefer {activityType} options that match the weather.");
+            sb.AppendLine($"- For activities, prefer {request.ActivityType} options that match the weather.");
             sb.AppendLine("- For restaurants, prefer variety in cuisine when possible.");
             sb.AppendLine("- For parking, prefer covered or multi-storey on cloudy/rainy days.");
             sb.AppendLine("- Write a 2-3 sentence plain-English summary of the day plan.");

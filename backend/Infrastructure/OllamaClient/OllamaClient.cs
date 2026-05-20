@@ -24,6 +24,7 @@ namespace familly_trip_advisor.Infrastructure.OllamaClient
             AdditionalProperties = new AdditionalPropertiesDictionary
             {
                 ["think"] = false,
+                ["keep_alive"] = 10m,
             }
         };
 

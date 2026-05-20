@@ -42,7 +42,11 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning
                     BackoffType = DelayBackoffType.Exponential,
                     UseJitter = true,
                     ShouldHandle = new PredicateBuilder<Result<T>>()
-                        .Handle<Exception>(ex => ex is not OperationCanceledException)
+                        .Handle<HttpRequestException>()
+                        .Handle<JsonException>()
+                        .Handle<TaskCanceledException>(ex =>
+                            ex is not OperationCanceledException oce ||
+                            !oce.CancellationToken.IsCancellationRequested)
                         .HandleResult(r => r.IsFailed)
                 })
                 .Build();
@@ -94,7 +98,13 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning
 
         public Task<Result<TripPlanDto>> GenerateTripPlanAsync(GenerateTripPlanCommand command, CancellationToken cancellationToken)
         {
-            var prompt = _tripPlanPromptBuilder.BuildTripPlanPrompt(command.Intention, command.Weather, command.ActivityType, command.Places);
+            var prompt = _tripPlanPromptBuilder.BuildTripPlanPrompt(new BuildTripPlanRequest
+            {
+                Intention = command.Intention,
+                ActivityType = command.ActivityType,
+                Weather = command.Weather,
+                Places = command.Places
+            });
             var sessionId = command.SessionId ?? Guid.NewGuid().ToString();
 
             return ExecuteWithResilienceAsync<TripPlanDto>(async ct =>

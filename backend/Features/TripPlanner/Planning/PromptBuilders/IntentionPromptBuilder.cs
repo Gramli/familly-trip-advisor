@@ -26,28 +26,31 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
             var home = _options.Value;
             var today = _dateTimeProvider.GetDateOnly();
 
-            var systemPrompt = "You are a trip intent extractor. Analyze the user message and return ONLY a valid JSON object — no markdown, no explanation, no code fences.\n\n" +
-                $"Today's date is {today:yyyy-MM-dd} ({today:dddd}).\n" +
-                $"Home location: \"{home.HomeName ?? "Home"}\" at latitude {home.HomeLatitude}, longitude {home.HomeLongitude}.\n\n" +
-                "Rules:\n" +
-                "- \"date\": resolve relative expressions like \"Saturday\", \"Friday\", \"next weekend\" to the nearest upcoming date in yyyy-MM-dd format.\n" +
-                "- \"destination\": the place name the user mentioned, or null if none.\n" +
-                "- \"latitude\" and \"longitude\": GPS coordinates of the destination. If no destination is mentioned, use the home coordinates.\n" +
-                "- \"isHomeLocation\": true if home coordinates are used, false if a destination was detected.\n" +
-                "- \"preferredActivity\": if the user expresses a preference for indoor or outdoor activities (e.g. \"prefer indoor\", \"something outside\", \"stay inside\"), set this to \"Indoor\" or \"Outdoor\". Otherwise set it to null.\n\n" +
-                "Return exactly this JSON structure:\n" +
-                "{\n" +
-                "  \"date\": \"yyyy-MM-dd\",\n" +
-                "  \"destination\": \"City name or null\",\n" +
-                "  \"latitude\": 0.0,\n" +
-                "  \"longitude\": 0.0,\n" +
-                "  \"isHomeLocation\": true,\n" +
-                "  \"preferredActivity\": \"Indoor or Outdoor or null\"\n" +
-                "}";
+            return $$"""
+                You are a trip intent extractor. Analyze the user message and return ONLY a valid JSON object — no markdown, no explanation, no code fences.
 
-            var fullPrompt = $"{systemPrompt}\n\nUser message: {userPrompt}";
+                Today's date is {{today:yyyy-MM-dd}} ({{today:dddd}}).
+                Home location: "{{home.HomeName ?? "Home"}}" at latitude {{home.HomeLatitude}}, longitude {{home.HomeLongitude}}.
 
-            return fullPrompt;
+                Rules:
+                - "date": resolve relative expressions like "Saturday", "Friday", "next weekend" to the nearest upcoming date in yyyy-MM-dd format.
+                - "destination": the place name the user mentioned, or null if none.
+                - "latitude" and "longitude": GPS coordinates of the destination. If no destination is mentioned, use the home coordinates.
+                - "isHomeLocation": true if home coordinates are used, false if a destination was detected.
+                - "preferredActivity": if the user expresses a preference for indoor or outdoor activities (e.g. "prefer indoor", "something outside", "stay inside"), set this to "Indoor" or "Outdoor". Otherwise set it to null.
+
+                Return exactly this JSON structure:
+                {
+                  "date": "yyyy-MM-dd",
+                  "destination": "City name or null",
+                  "latitude": 0.0,
+                  "longitude": 0.0,
+                  "isHomeLocation": true,
+                  "preferredActivity": "Indoor or Outdoor or null"
+                }
+
+                User message: {{userPrompt}}
+                """;
         }
     }
 }

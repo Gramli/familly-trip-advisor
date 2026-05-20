@@ -36,7 +36,12 @@ namespace familly_trip_advisor.Infrastructure.GeoapifyClient
                     Delay = TimeSpan.FromSeconds(2),
                     BackoffType = DelayBackoffType.Exponential,
                     UseJitter = true,
-                    ShouldHandle = new PredicateBuilder().Handle<Exception>(ex => ex is not OperationCanceledException),
+                    ShouldHandle = new PredicateBuilder()
+                        .Handle<HttpRequestException>()
+                        .Handle<JsonException>()
+                        .Handle<TaskCanceledException>(ex =>
+                            ex is not OperationCanceledException oce ||
+                            !oce.CancellationToken.IsCancellationRequested),
                     OnRetry = args =>
                     {
                         _logger.LogWarning(
