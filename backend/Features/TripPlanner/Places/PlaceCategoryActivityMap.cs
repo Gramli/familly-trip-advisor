@@ -72,6 +72,72 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                 { "natural.water.spring",                   Activity.Outdoor },
                 { "natural.water.whitewater",               Activity.Outdoor },
                 { "natural.wetland",                        Activity.Outdoor },
+
+                // Sport — split by typical indoor/outdoor nature
+                { "sport.dive_centre",                      Activity.Outdoor },
+                { "sport.dojo",                             Activity.Indoor  },
+                { "sport.fishing",                          Activity.Outdoor },
+                { "sport.fitness",                          Activity.Indoor  },
+                { "sport.fitness.fitness_centre",           Activity.Indoor  },
+                { "sport.fitness.fitness_station",          Activity.Outdoor },
+                { "sport.fitness.gym",                      Activity.Indoor  },
+                { "sport.golf_course",                      Activity.Outdoor },
+                { "sport.horse_riding",                     Activity.Outdoor },
+                { "sport.ice_rink",                         Activity.Indoor  },
+                { "sport.pitch",                            Activity.Outdoor },
+                { "sport.shooting",                         Activity.Both    },
+                { "sport.skateboard",                       Activity.Outdoor },
+                { "sport.sports_centre",                    Activity.Both    },
+                { "sport.sports_hall",                      Activity.Indoor  },
+                { "sport.stadium",                          Activity.Outdoor },
+                { "sport.swimming_pool",                    Activity.Both    },
+                { "sport.track",                            Activity.Outdoor },
+
+                // Tourism — mostly outdoor / mixed sights
+                { "tourism.attraction",                     Activity.Outdoor },
+                { "tourism.attraction.artwork",             Activity.Outdoor },
+                { "tourism.attraction.viewpoint",           Activity.Outdoor },
+                { "tourism.attraction.fountain",            Activity.Outdoor },
+                { "tourism.sights",                         Activity.Outdoor },
+                { "tourism.sights.castle",                  Activity.Outdoor },
+                { "tourism.sights.archaeological_site",     Activity.Outdoor },
+                { "tourism.sights.monastery",               Activity.Outdoor },
+                { "tourism.sights.ruines",                  Activity.Outdoor },
+                { "tourism.sights.tower",                   Activity.Outdoor },
+                { "tourism.sights.lighthouse",              Activity.Outdoor },
+                { "tourism.sights.windmill",                Activity.Outdoor },
+                { "tourism.sights.memorial",                Activity.Outdoor },
+                { "tourism.sights.place_of_worship",        Activity.Indoor  },
+                { "tourism.sights.conference_centre",       Activity.Indoor  },
+
+                // Camping / beach — outdoor
+                { "camping",                                Activity.Outdoor },
+                { "camping.camp_site",                      Activity.Outdoor },
+                { "camping.caravan_site",                   Activity.Outdoor },
+                { "camping.summer_camp",                    Activity.Outdoor },
+                { "beach",                                  Activity.Outdoor },
+                { "beach.beach_resort",                     Activity.Outdoor },
+
+                // Ski — outdoor
+                { "ski",                                    Activity.Outdoor },
+                { "ski.lift",                               Activity.Outdoor },
+                { "ski.lift.cable_car",                     Activity.Outdoor },
+                { "ski.lift.chair_lift",                    Activity.Outdoor },
+                { "ski.lift.gondola",                       Activity.Outdoor },
+
+                // Rental — follows activity context
+                { "rental.bicycle",                         Activity.Outdoor },
+                { "rental.boat",                            Activity.Outdoor },
+                { "rental.ski",                             Activity.Outdoor },
+
+                // Activity (clubs / community)
+                { "activity.community_center",              Activity.Indoor  },
+                { "activity.events_venue",                  Activity.Indoor  },
+                { "activity.sport_club",                    Activity.Both    },
+                { "activity.hackerspace",                   Activity.Indoor  },
+
+                // National park — outdoor
+                { "national_park",                          Activity.Outdoor },
             };
 
         /// <summary>
@@ -86,7 +152,8 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                 [
                     // natural — 100% outdoor, one parent key covers everything
                     "natural",
-                    // leisure outdoor sub-groups — parent keys cover all children
+                    "national_park",
+                    // leisure outdoor sub-groups (spa is indoor so use leaf keys)
                     "leisure.park",
                     "leisure.picnic",
                     "leisure.playground",
@@ -98,6 +165,28 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                     "entertainment.theme_park",
                     "entertainment.water_park",
                     "entertainment.zoo",
+                    // sport outdoor
+                    "sport.dive_centre",
+                    "sport.fishing",
+                    "sport.fitness.fitness_station",
+                    "sport.golf_course",
+                    "sport.horse_riding",
+                    "sport.pitch",
+                    "sport.skateboard",
+                    "sport.stadium",
+                    "sport.track",
+                    // tourism outdoor
+                    "tourism.attraction",
+                    "tourism.sights",
+                    // camping & beach
+                    "camping",
+                    "beach",
+                    // ski
+                    "ski",
+                    // rental outdoor
+                    "rental.bicycle",
+                    "rental.boat",
+                    "rental.ski",
                 ],
 
                 [Activity.Indoor] =
@@ -114,6 +203,19 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                     "entertainment.escape_game",
                     "entertainment.museum",
                     "entertainment.planetarium",
+                    // sport indoor
+                    "sport.dojo",
+                    "sport.fitness.fitness_centre",
+                    "sport.fitness.gym",
+                    "sport.ice_rink",
+                    "sport.sports_hall",
+                    // tourism indoor sights
+                    "tourism.sights.place_of_worship",
+                    "tourism.sights.conference_centre",
+                    // activity (clubs / venues)
+                    "activity.community_center",
+                    "activity.events_venue",
+                    "activity.hackerspace",
                 ],
 
                 [Activity.Both] =
@@ -121,6 +223,12 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                     "entertainment",
                     "leisure",
                     "natural",
+                    "sport",
+                    "tourism",
+                    "camping",
+                    "beach",
+                    "ski",
+                    "activity",
                 ]
             };
     }

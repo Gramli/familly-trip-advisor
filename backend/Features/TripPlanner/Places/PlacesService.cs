@@ -66,7 +66,8 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                 Latitude = activityPlacesRequest.Latitude,
                 Longitude = activityPlacesRequest.Longitude,
                 RadiusMeters = activityPlacesRequest.RadiusMeters ?? defaultRadiusMeters,
-                Categories = [.. PlaceCategoryActivityMap.ApiCategories[activityPlacesRequest.Activity]]
+                Categories = [.. PlaceCategoryActivityMap.ApiCategories[activityPlacesRequest.Activity]],
+                Limit = 15
             };
 
             return await _geoapifyHttpClient.GetEntertainmentPlaces(placesRequest, cancellationToken);
