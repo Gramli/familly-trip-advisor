@@ -11,7 +11,6 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
         public static readonly IReadOnlyDictionary<string, Activity> Categories =
             new Dictionary<string, Activity>
             {
-                // Entertainment — mixed, must be specified at leaf level
                 { "entertainment.activity_park",            Activity.Outdoor },
                 { "entertainment.activity_park.climbing",   Activity.Outdoor },
                 { "entertainment.activity_park.trampoline", Activity.Indoor  },
@@ -141,6 +140,16 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
             };
 
         /// <summary>
+        /// Top-level Geoapify category keys — single source of truth used by both the intention
+        /// prompt (to constrain model output) and the places resolver (to validate model output).
+        /// </summary>
+        public static readonly IReadOnlySet<string> TopLevelCategories = new HashSet<string>
+        {
+            "entertainment", "leisure", "natural", "sport", "tourism",
+            "camping", "beach", "ski", "activity", "national_park", "rental"
+        };
+
+        /// <summary>
         /// Optimised Geoapify API category strings per activity type.
         /// Groups that are entirely one activity use their parent key (shorter URL).
         /// Mixed groups (entertainment) are enumerated at leaf level.
@@ -178,10 +187,8 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                     // tourism outdoor
                     "tourism.attraction",
                     "tourism.sights",
-                    // camping & beach
                     "camping",
                     "beach",
-                    // ski
                     "ski",
                     // rental outdoor
                     "rental.bicycle",
@@ -191,7 +198,6 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
 
                 [Activity.Indoor] =
                 [
-                    // leisure.spa — 100% indoor, one parent key covers all children
                     "leisure.spa",
                     // entertainment indoor leaf keys (group is mixed)
                     "entertainment.activity_park.trampoline",

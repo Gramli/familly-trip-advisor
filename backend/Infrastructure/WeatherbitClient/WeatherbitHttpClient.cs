@@ -41,7 +41,6 @@ namespace familly_trip_advisor.Infrastructure.WeatherbitClient
                     UseJitter = true,
                     ShouldHandle = new PredicateBuilder()
                         .Handle<HttpRequestException>()
-                        .Handle<JsonException>()
                         .Handle<TaskCanceledException>(ex =>
                             ex is not OperationCanceledException oce ||
                             !oce.CancellationToken.IsCancellationRequested),

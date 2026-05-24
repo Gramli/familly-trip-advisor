@@ -32,7 +32,6 @@ namespace familly_trip_advisor.Features.TripPlanner
                 .AddSingleton<IGetTripPlanQueryValidator, GetTripPlanQueryValidator>()
                 .AddScoped<IPlanningService, PlanningService>()
                 .AddSingleton<IIntentionPromptBuilder, IntentionPromptBuilder>()
-                .AddSingleton<IActivityPromptBuilder, ActivityPromptBuilder>()
                 .AddSingleton<ITripPlanPromptBuilder, TripPlanPromptBuilder>()
                 .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                 .AddScoped<IWeatherService, WeatherService>()

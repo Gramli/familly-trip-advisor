@@ -21,5 +21,8 @@ namespace familly_trip_advisor.Features.TripPlanner.Models
 
         [JsonPropertyName("preferredActivity")]
         public Activity? PreferredActivity { get; init; }
+
+        [JsonPropertyName("categories")]
+        public IReadOnlyList<string>? Categories { get; init; }
     }
 }

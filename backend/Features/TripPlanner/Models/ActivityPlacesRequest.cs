@@ -6,5 +6,6 @@
         public double Latitude { get; init; }
         public double Longitude { get; init; }
         public int? RadiusMeters { get; init; }
+        public IReadOnlyList<string>? Categories { get; init; }
     }
 }

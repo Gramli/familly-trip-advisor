@@ -66,11 +66,26 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                 Latitude = activityPlacesRequest.Latitude,
                 Longitude = activityPlacesRequest.Longitude,
                 RadiusMeters = activityPlacesRequest.RadiusMeters ?? defaultRadiusMeters,
-                Categories = [.. PlaceCategoryActivityMap.ApiCategories[activityPlacesRequest.Activity]],
+                Categories = [.. ResolveCategories(activityPlacesRequest)],
                 Limit = 15
             };
 
             return await _geoapifyHttpClient.GetEntertainmentPlaces(placesRequest, cancellationToken);
+        }
+
+        private static IReadOnlyList<string> ResolveCategories(ActivityPlacesRequest request)
+        {
+            if (request.Categories is { Count: > 0 })
+            {
+                var valid = request.Categories
+                    .Where(PlaceCategoryActivityMap.TopLevelCategories.Contains)
+                    .ToList();
+
+                if (valid.Count > 0)
+                    return valid;
+            }
+
+            return PlaceCategoryActivityMap.ApiCategories[request.Activity];
         }
 
         private static IReadOnlyCollection<RestaurantDto> MapToRestaurants(PlacesDataModel model) =>

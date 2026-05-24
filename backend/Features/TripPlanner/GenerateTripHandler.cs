@@ -3,6 +3,7 @@ using familly_trip_advisor.Features.TripPlanner.Models;
 using familly_trip_advisor.Features.TripPlanner.Places;
 using familly_trip_advisor.Features.TripPlanner.Planning;
 using familly_trip_advisor.Features.TripPlanner.Weather;
+using familly_trip_advisor.Shared;
 using SmallApiToolkit.Core.Extensions;
 using SmallApiToolkit.Core.RequestHandlers;
 using SmallApiToolkit.Core.Response;
@@ -36,55 +37,44 @@ namespace familly_trip_advisor.Features.TripPlanner
             var validationResult = _getTripPlanQueryValidator.Validate(request);
             if (validationResult.IsFailed)
             {
-                _logger.LogError("Validation failed for CreateTripPlanCommand: {Errors}", string.Join(", ", validationResult.Errors));
-                return HttpDataResponses.AsBadRequest<TripPlanDto>(string.Join(", ", validationResult.Errors));
+                _logger.LogError("Validation failed for CreateTripPlanCommand: {Errors}", validationResult.ToErrorString());
+                return HttpDataResponses.AsBadRequest<TripPlanDto>(validationResult.ToErrorString());
             }
 
             var intentionResult = await _planningService.ExtractIntentionAsync(request.Prompt, cancellationToken);
 
             if (intentionResult.IsFailed) 
             { 
-                _logger.LogError("Failed to extract intention: {Errors}", string.Join(", ", intentionResult.Errors));
-                return HttpDataResponses.AsInternalServerError<TripPlanDto>(string.Join(", ", intentionResult.Errors));
+                _logger.LogError("Failed to extract intention: {Errors}", intentionResult.ToErrorString());
+                return HttpDataResponses.AsInternalServerError<TripPlanDto>(intentionResult.ToErrorString());
             }
 
             var weatherResult = await _weatherService.GetWeatherForecastAsync(intentionResult.Value.Latitude, intentionResult.Value.Longitude, intentionResult.Value.Date, cancellationToken);
 
             if (weatherResult.IsFailed)
             {
-                _logger.LogError("Failed to get weather forecast: {Errors}", string.Join(", ", weatherResult.Errors));
-                return HttpDataResponses.AsInternalServerError<TripPlanDto>(string.Join(", ", weatherResult.Errors));
+                _logger.LogError("Failed to get weather forecast: {Errors}", weatherResult.ToErrorString());
+                return HttpDataResponses.AsInternalServerError<TripPlanDto>(weatherResult.ToErrorString());
             }
 
-            var activity = intentionResult.Value.PreferredActivity ?? Activity.Indoor;
-
-            if (!intentionResult.Value.PreferredActivity.HasValue)
-            {
-                var activitiesResult = await _planningService.GetActivityByWeatherAsync(weatherResult.Value, cancellationToken);
-
-                if (activitiesResult.IsFailed)
-                {
-                    _logger.LogError("Failed to determine activity by weather: {Errors}", string.Join(", ", activitiesResult.Errors));
-                    return HttpDataResponses.AsInternalServerError<TripPlanDto>(string.Join(", ", activitiesResult.Errors));
-                }
-
-                activity = activitiesResult.Value;
-            }
+            var activity = intentionResult.Value.PreferredActivity
+                ?? ActivityTypeResolver.Resolve(weatherResult.Value);
 
             var placesRequest = new ActivityPlacesRequest
             {
                 Latitude = intentionResult.Value.Latitude,
                 Longitude = intentionResult.Value.Longitude,
                 Activity = activity,
-                RadiusMeters = request.RadiusInMeters
+                RadiusMeters = request.RadiusInMeters,
+                Categories = intentionResult.Value.Categories
             };
 
             var placesResult = await _placesService.GetTripPlacesAsync(placesRequest, cancellationToken);
 
             if (placesResult.IsFailed)
             {
-                _logger.LogError("Failed to get places for activity: {Errors}", string.Join(", ", placesResult.Errors));
-                return HttpDataResponses.AsInternalServerError<TripPlanDto>(string.Join(", ", placesResult.Errors));
+                _logger.LogError("Failed to get places for activity: {Errors}", placesResult.ToErrorString());
+                return HttpDataResponses.AsInternalServerError<TripPlanDto>(placesResult.ToErrorString());
             }
 
             var planResult = await _planningService.GenerateTripPlanAsync(
@@ -100,8 +90,8 @@ namespace familly_trip_advisor.Features.TripPlanner
 
             if (planResult.IsFailed)
             {
-                _logger.LogError("Failed to generate trip plan: {Errors}", string.Join(", ", planResult.Errors));
-                return HttpDataResponses.AsInternalServerError<TripPlanDto>(string.Join(", ", planResult.Errors));
+                _logger.LogError("Failed to generate trip plan: {Errors}", planResult.ToErrorString());
+                return HttpDataResponses.AsInternalServerError<TripPlanDto>(planResult.ToErrorString());
             }
 
             return HttpDataResponses.AsOK(planResult.Value);

@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using familly_trip_advisor.Features.TripPlanner.Models;
+using familly_trip_advisor.Features.TripPlanner.Places;
 using familly_trip_advisor.Shared;
 using Microsoft.Extensions.Options;
 
@@ -14,6 +15,9 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
     {
         private readonly IOptions<TripPlannerOptions> _options;
         private readonly IDateTimeProvider _dateTimeProvider;
+
+        private static readonly string AvailableCategories =
+            string.Join(", ", PlaceCategoryActivityMap.TopLevelCategories);
 
         public IntentionPromptBuilder(IOptions<TripPlannerOptions> options, IDateTimeProvider dateTimeProvider)
         {
@@ -38,6 +42,7 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
                 - "latitude" and "longitude": GPS coordinates of the destination. If no destination is mentioned, use the home coordinates.
                 - "isHomeLocation": true if home coordinates are used, false if a destination was detected.
                 - "preferredActivity": if the user expresses a preference for indoor or outdoor activities (e.g. "prefer indoor", "something outside", "stay inside"), set this to "Indoor" or "Outdoor". Otherwise set it to null.
+                - "categories": pick zero or more values from this exact list that match what the user wants to do: {{AvailableCategories}}. Return them as a JSON array of strings. If the user does not mention any specific activity or interest, return null.
 
                 Return exactly this JSON structure:
                 {
@@ -46,7 +51,8 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
                   "latitude": 0.0,
                   "longitude": 0.0,
                   "isHomeLocation": true,
-                  "preferredActivity": "Indoor or Outdoor or null"
+                  "preferredActivity": "Indoor or Outdoor or null",
+                  "categories": ["category1", "category2"] or null
                 }
 
                 User message: {{userPrompt}}

@@ -38,7 +38,7 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
 
             // ── Output rules ─────────────────────────────────────────────────────────
             sb.AppendLine("## Rules");
-            sb.AppendLine("- Pick exactly 2 or 3 activities, 2 or 3 restaurants, and 2 or 3 parking spots.");
+            sb.AppendLine("- Pick exactly 2 or 3 activities, 2 or 3 restaurants, and 2 or 3 parking spots. If a section has fewer than 2 entries, select all available entries.");
             sb.AppendLine("- Prefer places CLOSER to the destination (smaller distance is better).");
             sb.AppendLine($"- For activities, prefer {request.ActivityType} options that match the weather.");
             sb.AppendLine("- For restaurants, prefer variety in cuisine when possible.");

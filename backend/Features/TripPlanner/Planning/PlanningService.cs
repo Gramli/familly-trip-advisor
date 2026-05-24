@@ -15,7 +15,6 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning
     public interface IPlanningService
     {
         Task<Result<TripIntentionDto>> ExtractIntentionAsync(string prompt, CancellationToken cancellationToken);
-        Task<Result<Activity>> GetActivityByWeatherAsync(ForecastWeatherDto forecastWeather, CancellationToken cancellationToken);
         Task<Result<TripPlanDto>> GenerateTripPlanAsync(GenerateTripPlanCommand command, CancellationToken cancellationToken);
     }
 
@@ -23,7 +22,6 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning
     {
         private readonly IOllamaClient _ollamaClient;
         private readonly IIntentionPromptBuilder _intentionPromptBuilder;
-        private readonly IActivityPromptBuilder _activityPromptBuilder;
         private readonly ITripPlanPromptBuilder _tripPlanPromptBuilder;
 
         private static readonly JsonSerializerOptions JsonOptions = new()
@@ -54,29 +52,11 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning
 
         public PlanningService(IOllamaClient ollamaClient,
             IIntentionPromptBuilder intentionPromptBuilder,
-            IActivityPromptBuilder activityPromptBuilder,
             ITripPlanPromptBuilder tripPlanPromptBuilder)
         {
             _ollamaClient = Guard.Against.Null(ollamaClient);
             _intentionPromptBuilder = Guard.Against.Null(intentionPromptBuilder);
-            _activityPromptBuilder = Guard.Against.Null(activityPromptBuilder);
             _tripPlanPromptBuilder = Guard.Against.Null(tripPlanPromptBuilder);
-        }
-
-        public Task<Result<Activity>> GetActivityByWeatherAsync(ForecastWeatherDto forecastWeather, CancellationToken cancellationToken)
-        {
-            var prompt = _activityPromptBuilder.BuildActivityPrompt(forecastWeather);
-
-            return ExecuteWithResilienceAsync<Activity>(async ct =>
-            {
-                var raw = await _ollamaClient.GetResponseAsync(prompt, ct);
-                var trimmed = raw.Trim();
-
-                return Enum.TryParse<Activity>(trimmed, ignoreCase: true, out var activity)
-                    ? Result.Ok(activity)
-                    : Result.Fail($"Model returned an unrecognised activity value: '{trimmed}'.");
-
-            }, "Failed to determine activity by weather", cancellationToken);
         }
 
         public Task<Result<TripIntentionDto>> ExtractIntentionAsync(string prompt, CancellationToken cancellationToken)
