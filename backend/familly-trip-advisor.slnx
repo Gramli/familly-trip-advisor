@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="familly-trip-advisor.csproj" />
+  <Project Path="Tests/familly-trip-advisor.UnitTests/familly-trip-advisor.UnitTests.csproj" Id="68bcef8e-bd75-43d2-b1cc-04500dc733ce" />
 </Solution>

@@ -90,6 +90,12 @@ export class ChatWindow {
       });
   }
 
+  clearSession(): void {
+    this.chatHistory.set([]);
+    this.sessionId.set(null);
+    this.selectedRadius = 5000;
+  }
+
   onKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();

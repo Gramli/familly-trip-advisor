@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using familly_trip_advisor.Shared;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,6 +15,7 @@ namespace familly_trip_advisor.Infrastructure.GeoapifyClient
         Task<Result<PlacesDataModel>> GetRestaurantPlaces(PlacesRequest placesRequest, CancellationToken cancellationToken);
         Task<Result<PlacesDataModel>> GetEntertainmentPlaces(PlacesWithCategoriesRequest placesRequest, CancellationToken cancellationToken);
         Task<Result<PlacesDataModel>> GetParkingPlaces(PlacesRequest placesRequest, CancellationToken cancellationToken);
+        Task<Result<GpsCoordinatesDto>> GetCoordinatesByCity(string cityName, CancellationToken cancellationToken);
     }
     internal sealed class GeoapifyHttpClient : IGeoapifyHttpClient
     {
@@ -76,6 +78,25 @@ namespace familly_trip_advisor.Infrastructure.GeoapifyClient
         {
             const string categories = "parking.cars";
             return GetPlacesByRadius(categories, placesRequest.Latitude, placesRequest.Longitude, placesRequest.RadiusMeters, placesRequest.Limit, cancellationToken);
+        }
+
+        public async Task<Result<GpsCoordinatesDto>> GetCoordinatesByCity(string cityName, CancellationToken cancellationToken)
+        {
+            Guard.Against.NullOrWhiteSpace(cityName);
+
+            var encodedCity = Uri.EscapeDataString(cityName);
+            var url = $"{_options.Value.BaseUrl}/v1/geocode/search?text={encodedCity}&format=json&apiKey={_options.Value.ApiKey}";
+
+            var result = await SendAsync<GeocodingDataModel>(url, cancellationToken);
+
+            if (result.IsFailed)
+                return result.ToResult();
+
+            var best = result.Value.Results.FirstOrDefault();
+            if (best is null)
+                return Result.Fail($"No geocoding results found for city '{cityName}'.");
+
+            return Result.Ok(new GpsCoordinatesDto { Latitude = best.Lat, Longitude = best.Lon });
         }
 
         private Task<Result<PlacesDataModel>> GetPlacesByRadius(string categories, double latitude, double longitude, int radiusMeters, int limit, CancellationToken cancellationToken)

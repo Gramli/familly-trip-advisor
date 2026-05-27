@@ -125,6 +125,36 @@ http://localhost:4200
 
 ---
 
+### Script Arguments
+
+The script accepts optional switches to control what gets started:
+
+| Argument | Description |
+|---|---|
+| `-Backend` | Start the backend only |
+| `-Frontend` | Start the frontend only |
+| `-Expose` | Bind to `0.0.0.0` so the app is accessible from other devices on your local network |
+
+**Examples:**
+
+```powershell
+# Start only the backend
+.\start-app.ps1 -Backend
+
+# Start only the frontend
+.\start-app.ps1 -Frontend
+
+# Start both and expose on your local network
+.\start-app.ps1 -Expose
+
+# Start only the backend and expose it
+.\start-app.ps1 -Backend -Expose
+```
+
+When `-Expose` is used, the script will print the local IP address you can share with other devices on your network.
+
+---
+
 ### Stopping the App
 
 To stop a service, simply **close its window** or press **Ctrl + C** inside it. Close both windows to stop the app completely.

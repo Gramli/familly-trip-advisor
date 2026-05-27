@@ -89,4 +89,40 @@ namespace familly_trip_advisor.Infrastructure.GeoapifyClient
         [JsonPropertyName("coordinates")]
         public double[] Coordinates { get; set; } = [];
     }
+
+    public sealed class GeocodingDataModel
+    {
+        [JsonPropertyName("results")]
+        public List<GeocodingResultDto> Results { get; set; } = [];
+    }
+
+    public sealed class GeocodingResultDto
+    {
+        [JsonPropertyName("lat")]
+        public double Lat { get; set; }
+
+        [JsonPropertyName("lon")]
+        public double Lon { get; set; }
+
+        [JsonPropertyName("formatted")]
+        public string? Formatted { get; set; }
+
+        [JsonPropertyName("country")]
+        public string? Country { get; set; }
+
+        [JsonPropertyName("city")]
+        public string? City { get; set; }
+
+        [JsonPropertyName("rank")]
+        public GeocodingRankDto? Rank { get; set; }
+    }
+
+    public sealed class GeocodingRankDto
+    {
+        [JsonPropertyName("confidence")]
+        public double Confidence { get; set; }
+
+        [JsonPropertyName("confidence_city_level")]
+        public double ConfidenceCityLevel { get; set; }
+    }
 }

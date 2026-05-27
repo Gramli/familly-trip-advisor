@@ -1,25 +1,115 @@
 .spinner-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.625rem;
-  padding: 1rem 0;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 2rem 1.5rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+  min-width: 250px;
 }
 
-.spinner {
-  width: 1.75rem;
-  height: 1.75rem;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 0.75s linear infinite;
+.travel-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 180px;
+  height: 48px;
+}
+
+.travel-node {
+  font-size: 1.5rem;
+  z-index: 2;
+  background: var(--color-surface);
+  padding: 0 4px;
+}
+
+.travel-node.start {
+  animation: wiggle 2s infinite ease-in-out;
+}
+
+.travel-node.end {
+  animation: bounce 2s infinite cubic-bezier(0.28, 0.84, 0.42, 1);
+}
+
+.travel-path {
+  position: absolute;
+  top: 50%;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  border-top: 2px dashed var(--color-primary);
+  opacity: 0.3;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.travel-vehicle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  font-size: 1.75rem;
+  line-height: 1;
+  z-index: 3;
+  margin-top: -0.875rem;
+  margin-left: -0.875rem;
+  animation: drive-across 2.5s ease-in-out infinite;
+  display: flex;
+}
+
+.flip-icon {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+@keyframes drive-across {
+  0% {
+    left: 15%;
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-2px) scale(0.9);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.1);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(-2px) scale(0.9);
+  }
+  100% {
+    left: 85%;
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+  75% { transform: translateY(0); }
 }
 
 .spinner-text {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  animation: text-pulse 2s infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@keyframes text-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }

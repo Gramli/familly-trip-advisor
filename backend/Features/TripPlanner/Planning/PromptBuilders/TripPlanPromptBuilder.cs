@@ -24,6 +24,8 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning.Prompts
             sb.AppendLine($"- Date: {request.Intention.Date:dddd, MMMM d yyyy}");
             sb.AppendLine($"- Activity preference: {request.ActivityType}");
             sb.AppendLine($"- Weather: avg {request.Weather.Temp:F1}°C, min {request.Weather.MinTemp:F1}°C, max {request.Weather.MaxTemp:F1}°C, clouds {request.Weather.CloudsPercentage:F0}%, wind {request.Weather.WindSpeed:F1} m/s");
+            if (!string.IsNullOrWhiteSpace(request.Intention.Preferences))
+                sb.AppendLine($"- User preferences: {request.Intention.Preferences}");
             sb.AppendLine();
 
             // ── Candidate places ─────────────────────────────────────────────────────

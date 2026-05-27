@@ -2,13 +2,13 @@
 using familly_trip_advisor.Features.TripPlanner.Models;
 using familly_trip_advisor.Features.TripPlanner.Planning.Prompts;
 using familly_trip_advisor.Infrastructure.OllamaClient;
-using familly_trip_advisor.Infrastructure.WeatherbitClient;
 using familly_trip_advisor.Shared;
 using FluentResults;
 using Polly;
 using Polly.Retry;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace familly_trip_advisor.Features.TripPlanner.Planning
 {
@@ -27,7 +27,7 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
-            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+            Converters = { new JsonStringEnumConverter() }
         };
 
         private static class RetryPipeline<T>
@@ -112,6 +112,15 @@ namespace familly_trip_advisor.Features.TripPlanner.Planning
                     SuggestedParking = ResolveByIds(command.Places.Parking.ToList(), parkingIds, "P"),
                     PlanSummary = summary
                 };
+
+                if (plan.SuggestedParking.Count == 0 && command.Places.Parking.Count > 0)
+                {
+                    return Result.Fail("Model response did not include any parking suggestions.");
+                }
+                if (string.IsNullOrWhiteSpace(plan.PlanSummary))
+                {
+                    return Result.Fail("Model response did not include a plan summary.");
+                }
 
                 return Result.Ok(plan);
 

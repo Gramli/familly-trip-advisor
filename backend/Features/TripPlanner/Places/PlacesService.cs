@@ -1,12 +1,14 @@
 ﻿using Ardalis.GuardClauses;
 using familly_trip_advisor.Features.TripPlanner.Models;
 using familly_trip_advisor.Infrastructure.GeoapifyClient;
+using familly_trip_advisor.Shared;
 using FluentResults;
 
 namespace familly_trip_advisor.Features.TripPlanner.Places
 {
     public interface IPlacesService
     {
+        Task<Result<GpsCoordinatesDto>> GetCoordinatesByCityAsync(string cityName, CancellationToken cancellationToken);
         Task<Result<TripPlacesDto>> GetTripPlacesAsync(ActivityPlacesRequest activityPlacesRequest, CancellationToken cancellationToken);
     }
 
@@ -19,6 +21,9 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
         {
             _geoapifyHttpClient = Guard.Against.Null(geoapifyHttpClient);
         }
+
+        public Task<Result<GpsCoordinatesDto>> GetCoordinatesByCityAsync(string cityName, CancellationToken cancellationToken)
+            => _geoapifyHttpClient.GetCoordinatesByCity(cityName, cancellationToken);
 
         public async Task<Result<TripPlacesDto>> GetTripPlacesAsync(ActivityPlacesRequest activityPlacesRequest, CancellationToken cancellationToken)
         {
@@ -61,16 +66,29 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
 
         private async Task<Result<PlacesDataModel>> GetActivityPlacesAsync(ActivityPlacesRequest activityPlacesRequest, CancellationToken cancellationToken)
         {
+            var categories = ResolveCategories(activityPlacesRequest);
             var placesRequest = new PlacesWithCategoriesRequest
             {
                 Latitude = activityPlacesRequest.Latitude,
                 Longitude = activityPlacesRequest.Longitude,
                 RadiusMeters = activityPlacesRequest.RadiusMeters ?? defaultRadiusMeters,
-                Categories = [.. ResolveCategories(activityPlacesRequest)],
+                Categories = [.. categories],
                 Limit = 15
             };
 
-            return await _geoapifyHttpClient.GetEntertainmentPlaces(placesRequest, cancellationToken);
+            var result = await _geoapifyHttpClient.GetEntertainmentPlaces(placesRequest, cancellationToken);
+
+            if (result.IsSuccess && result.Value.Features.Count == 0)
+            {
+                var fallbackCategories = PlaceCategoryActivityMap.ApiCategories[activityPlacesRequest.Activity];
+                if (!fallbackCategories.SequenceEqual(categories))
+                {
+                    placesRequest.Categories = [.. fallbackCategories];
+                    result = await _geoapifyHttpClient.GetEntertainmentPlaces(placesRequest, cancellationToken);
+                }
+            }
+
+            return result;
         }
 
         private static IReadOnlyList<string> ResolveCategories(ActivityPlacesRequest request)
@@ -81,8 +99,19 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
                     .Where(PlaceCategoryActivityMap.TopLevelCategories.Contains)
                     .ToList();
 
-                if (valid.Count > 0)
+                if (valid.Count >= 3)
                     return valid;
+
+                if (valid.Count > 0)
+                {
+                    // Fewer than 3 model-selected categories — supplement with fallbacks
+                    // from the activity map until we have at least 3 distinct categories.
+                    var fallback = PlaceCategoryActivityMap.ApiCategories[request.Activity];
+                    var supplement = fallback
+                        .Where(c => !valid.Contains(c, StringComparer.OrdinalIgnoreCase))
+                        .Take(3 - valid.Count);
+                    return [.. valid, .. supplement];
+                }
             }
 
             return PlaceCategoryActivityMap.ApiCategories[request.Activity];
