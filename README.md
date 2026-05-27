@@ -1,5 +1,10 @@
 # 🗺️ Family Trip Advisor
 
+[![Backend Build](https://github.com/Gramli/familly-trip-advisor/actions/workflows/backend-build.yml/badge.svg)](https://github.com/Gramli/familly-trip-advisor/actions/workflows/backend-build.yml)
+[![Frontend Build](https://github.com/Gramli/familly-trip-advisor/actions/workflows/frontend-build.yml/badge.svg)](https://github.com/Gramli/familly-trip-advisor/actions/workflows/frontend-build.yml)
+![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)
+![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular)
+
 > Tell us where you'd like to go — and we'll plan the perfect day for your family.
 
 Family Trip Advisor is an AI-powered trip planning assistant that runs entirely on your own computer. Just describe your trip in plain language, and the app will suggest activities, restaurants, and parking — tailored to the weather and your preferences.
