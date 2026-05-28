@@ -104,8 +104,6 @@ namespace familly_trip_advisor.Features.TripPlanner.Places
 
                 if (valid.Count > 0)
                 {
-                    // Fewer than 3 model-selected categories — supplement with fallbacks
-                    // from the activity map until we have at least 3 distinct categories.
                     var fallback = PlaceCategoryActivityMap.ApiCategories[request.Activity];
                     var supplement = fallback
                         .Where(c => !valid.Contains(c, StringComparer.OrdinalIgnoreCase))

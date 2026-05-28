@@ -81,7 +81,7 @@ namespace familly_trip_advisor.Features.TripPlanner
                 Longitude = lon,
                 Activity = activity,
                 RadiusMeters = request.RadiusInMeters,
-                Categories = intention.Categories
+                Categories = intention.Categories,
             };
 
             var placesResult = await _placesService.GetTripPlacesAsync(placesRequest, cancellationToken);

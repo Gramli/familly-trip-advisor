@@ -1,0 +1,39 @@
+<div class="trip-sections">
+  <div class="tab-bar" role="tablist" aria-label="Trip sections">
+    @for (tab of tabs(); track tab.id) {
+      <button
+        role="tab"
+        type="button"
+        class="tab-bar__tab"
+        [class.tab-bar__tab--active]="activeTab() === tab.id"
+        [attr.aria-selected]="activeTab() === tab.id"
+        [attr.aria-controls]="tab.id + '-panel'"
+        [id]="tab.id + '-tab'"
+        (click)="setTab(tab.id)"
+      >
+        <span aria-hidden="true">{{ tab.icon }}</span>
+        <span class="tab-bar__tab-label">{{ tab.label }}</span>
+        <span class="tab-bar__badge" aria-hidden="true">{{ tab.count }}</span>
+      </button>
+    }
+  </div>
+
+  <div
+    class="tab-panel"
+    role="tabpanel"
+    [id]="activeTab() + '-panel'"
+    [attr.aria-labelledby]="activeTab() + '-tab'"
+  >
+    @switch (activeTab()) {
+      @case ('activities') {
+        <app-activity-list [activities]="plan().suggestedActivities" />
+      }
+      @case ('restaurants') {
+        <app-restaurant-list [restaurants]="plan().suggestedRestaurants" />
+      }
+      @case ('parking') {
+        <app-parking-list [parking]="plan().suggestedParking" />
+      }
+    }
+  </div>
+</div>

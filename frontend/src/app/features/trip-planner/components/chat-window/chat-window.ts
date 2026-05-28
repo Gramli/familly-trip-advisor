@@ -4,35 +4,34 @@ import {
   ElementRef,
   inject,
   Injector,
-  signal,
   viewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TripPlannerService } from '../../services/trip-planner.service';
-import { ChatTurn } from '../../models/trip-plan.model';
+import { ChatStateService } from '../../services/chat-state.service';
 import { LoadingSpinner } from '../../../../shared/components/loading-spinner/loading-spinner';
 import { TripPlan } from '../trip-plan/trip-plan';
+import { RadiusPicker } from '../radius-picker/radius-picker';
+import { SuggestedPrompts } from '../suggested-prompts/suggested-prompts';
 
 @Component({
   selector: 'app-chat-window',
-  imports: [CommonModule, FormsModule, LoadingSpinner, TripPlan],
+  imports: [CommonModule, FormsModule, LoadingSpinner, TripPlan, RadiusPicker, SuggestedPrompts],
   templateUrl: './chat-window.html',
   styleUrl: './chat-window.scss',
 })
 export class ChatWindow {
   private readonly tripPlannerService = inject(TripPlannerService);
+  private readonly state = inject(ChatStateService);
   private readonly injector = inject(Injector);
   private readonly messagesRef = viewChild<ElementRef<HTMLElement>>('messages');
 
-  readonly chatHistory = signal<ChatTurn[]>([]);
-  readonly sessionId = signal<string | null>(null);
-  readonly isLoading = signal(false);
+  readonly chatHistory = this.state.chatHistory;
+  readonly isLoading = this.state.isLoading;
+  readonly selectedRadius = this.state.selectedRadius;
 
   currentPrompt = '';
-
-  readonly radiuses = Array.from({ length: 10 }, (_, i) => (i + 1) * 5000);
-  selectedRadius = 5000;
 
   sendPrompt(): void {
     const prompt = this.currentPrompt.trim();
@@ -43,57 +42,67 @@ export class ChatWindow {
     this.scrollToBottom();
 
     const startTime = Date.now();
-    this.chatHistory.update((h) => [...h, { prompt, plan: null, error: null, loading: true }]);
+    this.state.chatHistory.update((h) => [
+      ...h,
+      { prompt, plan: null, error: null, loading: true },
+    ]);
     this.currentPrompt = '';
-    this.isLoading.set(true);
+    this.state.isLoading.set(true);
 
     this.tripPlannerService
       .generatePlan({
         prompt,
-        sessionId: this.sessionId() ?? undefined,
-        radiusInMeters: this.selectedRadius,
+        sessionId: this.state.sessionId() ?? undefined,
+        radiusInMeters: this.selectedRadius(),
       })
       .subscribe({
         next: (response) => {
           const durationMs = Date.now() - startTime;
           if (response.errors?.length) {
-            this.updateLastTurn({
+            this.state.updateLastTurn({
               loading: false,
               error: response.errors.join(', '),
               plan: null,
               durationMs,
             });
           } else if (response.data) {
-            this.sessionId.set(response.data.sessionId);
-            this.updateLastTurn({ loading: false, plan: response.data, error: null, durationMs });
+            this.state.sessionId.set(response.data.sessionId);
+            this.state.updateLastTurn({
+              loading: false,
+              plan: response.data,
+              error: null,
+              durationMs,
+            });
           } else {
-            this.updateLastTurn({
+            this.state.updateLastTurn({
               loading: false,
               error: 'No plan returned. Please try again.',
               plan: null,
               durationMs,
             });
           }
-          this.isLoading.set(false);
+          this.state.isLoading.set(false);
           this.scrollToBottom();
         },
         error: () => {
           const durationMs = Date.now() - startTime;
-          this.updateLastTurn({
+          this.state.updateLastTurn({
             loading: false,
             error: 'Failed to connect to the server. Please try again.',
             plan: null,
             durationMs,
           });
-          this.isLoading.set(false);
+          this.state.isLoading.set(false);
         },
       });
   }
 
   clearSession(): void {
-    this.chatHistory.set([]);
-    this.sessionId.set(null);
-    this.selectedRadius = 5000;
+    this.state.clearSession();
+  }
+
+  fillPrompt(prompt: string): void {
+    this.currentPrompt = prompt;
   }
 
   onKeyDown(event: KeyboardEvent): void {
@@ -101,14 +110,6 @@ export class ChatWindow {
       event.preventDefault();
       this.sendPrompt();
     }
-  }
-
-  private updateLastTurn(patch: Partial<ChatTurn>): void {
-    this.chatHistory.update((h) => {
-      const copy = [...h];
-      copy[copy.length - 1] = { ...copy[copy.length - 1], ...patch };
-      return copy;
-    });
   }
 
   private scrollToBottom(): void {
@@ -121,3 +122,4 @@ export class ChatWindow {
     );
   }
 }
+

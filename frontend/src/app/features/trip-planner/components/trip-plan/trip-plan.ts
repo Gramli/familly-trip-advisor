@@ -1,12 +1,10 @@
 import { Component, input } from '@angular/core';
 import { TripPlanDto } from '../../models/trip-plan.model';
-import { ActivityList } from '../activity-list/activity-list';
-import { RestaurantList } from '../restaurant-list/restaurant-list';
-import { ParkingList } from '../parking-list/parking-list';
+import { TripSectionTabs } from '../trip-section-tabs/trip-section-tabs';
 
 @Component({
   selector: 'app-trip-plan',
-  imports: [ActivityList, RestaurantList, ParkingList],
+  imports: [TripSectionTabs],
   templateUrl: './trip-plan.html',
   styleUrl: './trip-plan.scss'
 })

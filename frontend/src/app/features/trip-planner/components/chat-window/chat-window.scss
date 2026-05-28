@@ -174,28 +174,33 @@
 .chat-input-bar {
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem 0.75rem;
   flex-shrink: 0;
   box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 @media (min-width: 640px) {
   .chat-input-bar {
-    padding: 1rem 1.5rem;
+    padding: 0.75rem 1.5rem 1rem;
   }
 }
 
 .chat-input-bar__inner {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: flex-end;
   gap: 0.75rem;
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
   background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-card);
-  padding: 0.75rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
 
   &:focus-within {
@@ -204,58 +209,11 @@
   }
 }
 
-@media (min-width: 640px) {
-  .chat-input-bar__inner {
-    flex-direction: row;
-    align-items: flex-end;
-    padding: 0.75rem 0.75rem 0.75rem 1.25rem;
-  }
-}
-
-.chat-input-bar__controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-@media (min-width: 640px) {
-  .chat-input-bar__controls {
-    margin-bottom: 0.25rem;
-  }
-}
-
 .chat-input-bar__actions {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  width: 100%;
-}
-
-@media (min-width: 640px) {
-  .chat-input-bar__actions {
-    width: auto;
-  }
-}
-
-.chat-input-bar__radius {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  outline: none;
-  font-family: inherit;
-
-  &:focus {
-    border-color: var(--color-primary);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  flex-shrink: 0;
 }
 
 .chat-input-bar__textarea {
@@ -291,8 +249,9 @@
 }
 
 .chat-input-bar__send {
-  flex: 1;
-  height: 2.5rem;
+  flex: none;
+  width: var(--tap-target);
+  height: var(--tap-target);
   border-radius: 12px;
   border: none;
   background: var(--color-primary);
@@ -322,17 +281,9 @@
   }
 }
 
-@media (min-width: 640px) {
-  .chat-input-bar__send {
-    flex: none;
-    width: 2.5rem;
-    border-radius: 12px;
-  }
-}
-
-.chat-input-bar__header {
+.chat-input-bar__footer {
   max-width: 900px;
-  margin: 0.75rem auto 0.75rem auto;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
 }

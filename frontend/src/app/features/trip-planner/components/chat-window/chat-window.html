@@ -1,13 +1,11 @@
 <div class="chat-window">
-  <div class="chat-messages" #messages>
+  <div class="chat-messages" #messages role="log" aria-label="Trip planning conversation" aria-live="polite">
     @if (chatHistory().length === 0) {
       <div class="chat-empty">
         <span class="chat-empty__icon" aria-hidden="true">🏖️</span>
         <h2 class="chat-empty__title">Where would you like to go?</h2>
         <p class="chat-empty__subtitle">Describe your family trip and we'll plan the perfect day for you.</p>
-        <p class="chat-empty__hint">
-          Try: <em>"Plan a family day in Prague next Saturday with kids who love museums"</em>
-        </p>
+        <app-suggested-prompts (promptSelected)="fillPrompt($event)" />
       </div>
     }
 
@@ -17,11 +15,8 @@
           <div class="chat-turn__prompt">
             <span class="chat-turn__bubble">{{ turn.prompt }}</span>
           </div>
-          @if (turn.durationMs !== undefined) {
-            <div class="chat-turn__time">Response took: {{ turn.durationMs / 1000 | number:'1.1-2' }}s</div>
-          }
         </div>
-        <div class="chat-turn__response" aria-live="polite">
+        <div class="chat-turn__response">
           @if (turn.loading) {
             <app-loading-spinner />
           } @else if (turn.error) {
@@ -37,19 +32,11 @@
   </div>
 
   <div class="chat-input-bar">
+    <app-radius-picker
+      [(selectedRadius)]="selectedRadius"
+      [disabled]="isLoading()"
+    />
     <div class="chat-input-bar__inner">
-      <div class="chat-input-bar__controls">
-        <select 
-          class="chat-input-bar__radius" 
-          [(ngModel)]="selectedRadius" 
-          [disabled]="isLoading()" 
-          title="Search processing radius"
-          aria-label="Search processing radius">
-          @for (r of radiuses; track r) {
-            <option [value]="r">{{ r / 1000 }} km</option>
-          }
-        </select>
-      </div>
       <textarea
         class="chat-input-bar__textarea"
         placeholder="Describe your family trip..."
@@ -67,12 +54,12 @@
           aria-label="Send"
           type="button"
         >
-          <svg xmlns="http://www.w3.nlm.innovation" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
         </button>
       </div>
     </div>
-        @if (chatHistory().length > 0) {
-      <div class="chat-input-bar__header">
+    @if (chatHistory().length > 0) {
+      <div class="chat-input-bar__footer">
         <button
           class="chat-new-trip-btn"
           (click)="clearSession()"

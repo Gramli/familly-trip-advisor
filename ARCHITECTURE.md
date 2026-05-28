@@ -41,7 +41,7 @@ Features/TripPlanner/
 │       1. Validates the incoming command
 │       2. Calls PlanningService → extracts trip intention from the prompt
 │       3. Calls WeatherService  → fetches forecast for the destination date
-│       4. Calls PlanningService → determines Indoor / Outdoor activity
+│       4. Calls ActivityTypeResolver → resolves Indoor / Outdoor / Both from weather rules
 │       5. Calls PlacesService   → fetches activity, restaurant & parking places
 │       6. Calls PlanningService → generates the final AI trip plan
 │
@@ -49,8 +49,9 @@ Features/TripPlanner/
 │       Validates length, allowed characters, injection patterns, off-topic content
 │
 ├── Models/                         ← all DTOs & value objects owned by this slice
-│   ├── CreateTripPlanCommand.cs    input command  (prompt, sessionId, radiusInMeters)
-│   ├── GenerateTripPlanCommand.cs  internal command passed to PlanningService
+│   ├── GetTripPlanQuery.cs         input command  (prompt, sessionId, radiusInMeters)  → class: CreateTripPlanCommand
+│   ├── GenerateTripPlanCommand.cs  internal command passed to PlanningService (with sessionId)
+│   ├── BuildTripPlanRequest.cs     internal request for plan generation (without sessionId)
 │   ├── TripIntentionDto.cs         AI-extracted intent (date, coords, activity pref)
 │   ├── ActivityPlacesRequest.cs    request for place lookup
 │   ├── TripPlacesDto.cs            container: activities + restaurants + parking
@@ -59,7 +60,7 @@ Features/TripPlanner/
 │   ├── ActivityPlaceDto.cs         extends PlaceDto → activityType, category
 │   ├── RestaurantDto.cs            extends PlaceDto → categories[]
 │   ├── ParkingDto.cs               extends PlaceDto → parkingType
-│   ├── PlanningActivityType.cs     enum: Indoor | Outdoor | Both
+│   ├── PlanningActivityType.cs     enum Activity: Indoor | Outdoor | Both
 │   └── TripPlannerOptions.cs       config options (home location, etc.)
 │
 ├── Places/                         ← place-lookup sub-slice
@@ -71,11 +72,11 @@ Features/TripPlanner/
 ├── Planning/                       ← AI planning sub-slice
 │   ├── PlanningService.cs          drives all LLM interactions via OllamaClient
 │   │       ExtractIntentionAsync    → parses natural language prompt to TripIntentionDto
-│   │       GetActivityByWeatherAsync → asks LLM: Indoor or Outdoor?
 │   │       GenerateTripPlanAsync    → asks LLM to select places + write summary
+│   ├── ActivityTypeResolver.cs     rule-based resolver: maps weather data → Activity enum
+│   │       Resolve(ForecastWeatherDto) → evaluates temp, cloud cover & wind speed
 │   └── PromptBuilders/             each builder owns its own prompt template
 │       ├── IntentionPromptBuilder.cs   "extract trip intent as JSON"
-│       ├── ActivityPromptBuilder.cs    "pick Indoor or Outdoor based on forecast"
 │       └── TripPlanPromptBuilder.cs    "select best places and summarise the day"
 │
 └── Weather/                        ← weather sub-slice
@@ -92,8 +93,7 @@ Infrastructure/
 │   ├── GeoapifyHttpClient.cs       Places API: activities, restaurants, parking
 │   ├── PlacesDataModel.cs          raw API response models
 │   ├── GeoapifyOptions.cs          config (base URL, API key)
-│   └── ContainerConfigurationExtension.cs   registers client into DI
-│
+│   └── ContainerConfigurationExtension.cs   registers client into DI│
 ├── OllamaClient/
 │   ├── OllamaClient.cs             local LLM: GetResponseAsync / GetPreservedResponseAsync (with session)
 │   ├── OllamaOptions.cs            config (base URL, model name)
@@ -113,7 +113,8 @@ Shared/
 ├── DateTimeProvider.cs     abstraction over DateTime.Today (testable)
 ├── GeoCalculator.cs        haversine distance calculations
 ├── GpsCoordinatesDto.cs    GPS coordinate value object
-└── JsonExtractor.cs        extracts raw JSON block from LLM text responses
+├── JsonExtractor.cs        extracts raw JSON block from LLM text responses
+└── ResultExtensions.cs     FluentResults extension: ToErrorString() on ResultBase
 ```
 
 ### Request Flow (backend)
@@ -131,8 +132,7 @@ GenerateTripHandler           orchestrates the slice
     │       └─► IntentionPromptBuilder → OllamaClient
     ├─► WeatherService.GetWeatherForecastAsync
     │       └─► WeatherbitHttpClient
-    ├─► PlanningService.GetActivityByWeatherAsync
-    │       └─► ActivityPromptBuilder → OllamaClient
+    ├─► ActivityTypeResolver.Resolve()   (rule-based: temp / clouds / wind)
     ├─► PlacesService.GetTripPlacesAsync
     │       └─► GeoapifyHttpClient  (3 parallel calls)
     └─► PlanningService.GenerateTripPlanAsync

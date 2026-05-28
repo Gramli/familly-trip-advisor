@@ -23,4 +23,8 @@ export class PlaceCard {
   readonly mapsUrl = computed(() =>
     `https://www.google.com/maps/search/?api=1&query=${this.latitude()},${this.longitude()}`
   );
+
+  readonly mapsAriaLabel = computed(() =>
+    `Open ${this.name() ?? 'this place'} in Google Maps, opens in new tab`
+  );
 }

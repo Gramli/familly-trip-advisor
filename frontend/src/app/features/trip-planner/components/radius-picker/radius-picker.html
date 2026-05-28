@@ -1,0 +1,16 @@
+<div class="radius-picker" role="group" aria-label="Search radius">
+  <span class="radius-picker__label" aria-hidden="true">Radius:</span>
+  @for (r of radii; track r) {
+    <button
+      type="button"
+      class="radius-picker__chip"
+      [class.radius-picker__chip--active]="selectedRadius() === r"
+      [attr.aria-pressed]="selectedRadius() === r"
+      [attr.aria-label]="label(r)"
+      [disabled]="disabled()"
+      (click)="select(r)"
+    >
+      {{ r / 1000 }} km
+    </button>
+  }
+</div>

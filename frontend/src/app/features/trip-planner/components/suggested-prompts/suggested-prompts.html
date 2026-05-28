@@ -1,0 +1,14 @@
+<div class="suggested-prompts" role="group" aria-label="Example trip prompts">
+  <p class="suggested-prompts__label">Try one of these:</p>
+  <div class="suggested-prompts__chips">
+    @for (example of examples; track example) {
+      <button
+        type="button"
+        class="suggested-prompts__chip"
+        (click)="promptSelected.emit(example)"
+      >
+        {{ example }}
+      </button>
+    }
+  </div>
+</div>

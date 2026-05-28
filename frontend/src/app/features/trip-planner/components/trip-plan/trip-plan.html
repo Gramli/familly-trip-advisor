@@ -15,15 +15,5 @@
     </div>
   }
 
-  @if (plan().suggestedActivities.length) {
-    <app-activity-list [activities]="plan().suggestedActivities" />
-  }
-
-  @if (plan().suggestedRestaurants.length) {
-    <app-restaurant-list [restaurants]="plan().suggestedRestaurants" />
-  }
-
-  @if (plan().suggestedParking.length) {
-    <app-parking-list [parking]="plan().suggestedParking" />
-  }
+  <app-trip-section-tabs [plan]="plan()" />
 </div>

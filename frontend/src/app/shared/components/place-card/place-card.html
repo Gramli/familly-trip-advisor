@@ -2,7 +2,7 @@
   <div class="place-card__header">
     <span class="place-card__icon" aria-hidden="true">{{ icon() }}</span>
     <div class="place-card__info">
-      <h4 class="place-card__name">{{ name() ?? 'Unknown place' }}</h4>
+      <h4 class="place-card__name" [title]="name() ?? 'Unknown place'">{{ name() ?? 'Unknown place' }}</h4>
       @if (address()) {
         <p class="place-card__address">{{ address() }}</p>
       }
@@ -15,8 +15,12 @@
     @if (distance()) {
       <span class="place-card__distance">{{ distance() }}</span>
     }
-    <a class="place-card__maps-link" [href]="mapsUrl()" target="_blank" rel="noopener noreferrer">
-      Open in Maps ↗
+    <a class="place-card__maps-link"
+       [href]="mapsUrl()"
+       target="_blank"
+       rel="noopener noreferrer"
+       [attr.aria-label]="mapsAriaLabel()">
+      <span aria-hidden="true">↗</span> Maps
     </a>
   </div>
 </article>

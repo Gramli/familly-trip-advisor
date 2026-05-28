@@ -9,7 +9,7 @@
         [latitude]="activity.latitude"
         [longitude]="activity.longitude"
         [badge]="activity.category"
-        [icon]="categoryIcon(activity.category)"
+        [icon]="activity.category | activityIcon"
       />
     }
   </div>
